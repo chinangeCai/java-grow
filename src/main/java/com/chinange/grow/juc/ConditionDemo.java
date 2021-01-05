@@ -6,11 +6,11 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class ConditionDemo {
-    private int queueSize = 10;
-    private PriorityQueue<Integer> queue = new PriorityQueue<Integer>(queueSize);
-    private Lock lock = new ReentrantLock();
-    private Condition notFull = lock.newCondition();
-    private Condition notEmpty = lock.newCondition();
+    private final int queueSize = 10;
+    private final PriorityQueue<Integer> queue = new PriorityQueue<Integer>(queueSize);
+    private final Lock lock = new ReentrantLock();
+    private final Condition notFull = lock.newCondition();
+    private final Condition notEmpty = lock.newCondition();
 
     public static void main(String[] args) throws InterruptedException {
         ConditionDemo cd = new ConditionDemo();
@@ -35,15 +35,15 @@ public class ConditionDemo {
                 try{
                     while(queue.isEmpty()){
                         try{
-                            System.out.println("队列空，等待数据");
+                            System.out.println("queue is empty");
                             notEmpty.await();
                         }catch (InterruptedException e){
                             flag = false;
                         }
                     }
-                    queue.poll(); // 每次移走队首元素
+                    queue.poll(); // remove a e;
                     notFull.signal();
-                    System.out.println("从队列取走一个元素，队列剩余："+queue.size()+"个元素");
+                    System.out.println("queue left:"+queue.size());
                 }finally {
                     lock.unlock();
                 }
@@ -64,15 +64,15 @@ public class ConditionDemo {
                 try{
                     while(queue.size() == queueSize){
                         try{
-                            System.out.println("队列满，等待有空余空间");
+                            System.out.println("queue is full");
                             notFull.await();
                         }catch(InterruptedException e){
                             flag = false;
                         }
                     }
-                    queue.offer(1); // 每次插入一个元素
+                    queue.offer(1); // insert a e;
                     notEmpty.signal();
-                    System.out.println("向队列中插入一个元素， 队列剩余空间："+(queueSize - queue.size()));
+                    System.out.println("queue have: "+(queueSize - queue.size()));
                 }finally {
                     lock.unlock();
                 }
